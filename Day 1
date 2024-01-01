@@ -1,0 +1,166 @@
+//Day 1
+
+1] Minimize the Maximum of Two Arrays
+           #code
+
+class Solution {
+    // Function to find the minimum set size
+    public int minimizeSet(int divisor1, int divisor2, int uniqueCnt1, int uniqueCnt2) {
+        int low = 1;
+        int high = Integer.MAX_VALUE;
+        
+        // Binary search to find the minimum set size
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (isBlackBoxValid(mid, divisor1, divisor2, uniqueCnt1, uniqueCnt2))
+                high = mid;
+            else
+                low = mid + 1;
+        }
+        return low;
+    }
+
+    // Function to check if the black box is valid for a given number
+    public boolean isBlackBoxValid(long num, long d1, long d2, long c1, long c2) {
+        // Calculate how many elements are divisible by both d1 and d2
+        long bothDivisibleByD1AndD2 = num / lcm(d1, d2);
+
+        // Calculate how many elements can be stored in arr1 and arr2
+        long canBeStoredInArr1 = (num / d1) - bothDivisibleByD1AndD2;
+        long canBeStoredInArr2 = (num / d2) - bothDivisibleByD1AndD2;
+
+        // Calculate the remaining elements
+        long rest = num - (bothDivisibleByD1AndD2 + canBeStoredInArr1 + canBeStoredInArr2);
+
+        // Adjust remaining elements based on available unique counts
+        if (c1 >= canBeStoredInArr2) {
+            rest -= (c1 - canBeStoredInArr2);
+        }
+        if (c2 >= canBeStoredInArr1) {
+            rest -= (c2 - canBeStoredInArr1);
+        }
+
+        // Check if the remaining elements are non-negative
+        return rest >= 0;
+    }
+
+    // Function to calculate the least common multiple
+    public long lcm(long d1, long d2) {
+        return (d1 * d2) / gcd(d1, d2);
+    }
+
+    // Function to calculate the greatest common divisor
+    public long gcd(long a, long b) {
+        if (b == 0)
+            return a;
+        return gcd(b, a % b);
+    }
+}
+
+2] High-Access Employees
+      #code
+
+class Solution {
+    public List<String> findHighAccessEmployees(List<List<String>> accessTimes) {
+        // Map to store employee IDs and their access times
+        Map<String, List<Integer>> employeeAccessMap = new HashMap<>();
+
+        // Populate the map with employee IDs and corresponding access times
+        for (List<String> access : accessTimes) {
+            String employeeId = access.get(0);
+
+            // If the employee is not already in the map, add a new entry
+            if (!employeeAccessMap.containsKey(employeeId)) {
+                employeeAccessMap.put(employeeId, new ArrayList<>());
+            }
+
+            // Extract hour and minute from the access time string and convert to total minutes
+            char[] timeChars = access.get(1).toCharArray();
+            int hour = (timeChars[0] - '0') * 10 + (timeChars[1] - '0');
+            int minute = (timeChars[2] - '0') * 10 + (timeChars[3] - '0');
+            int totalMinutes = hour * 60 + minute;
+
+            // Add the total minutes to the employee's access time list
+            employeeAccessMap.get(employeeId).add(totalMinutes);
+        }
+
+        // List to store employees with high access frequency
+        List<String> highAccessEmployees = new ArrayList<>();
+
+        // Iterate through the employee access map
+        for (String employeeId : employeeAccessMap.keySet()) {
+            List<Integer> accessTimesList = employeeAccessMap.get(employeeId);
+            Collections.sort(accessTimesList);
+
+            // Check for high access frequency within a one-hour window
+            for (int i = 0; i < accessTimesList.size() - 2; i++) {
+                if (accessTimesList.get(i + 2) - accessTimesList.get(i) <= 59) {
+                    // Employee has high access frequency, add to the result list
+                    highAccessEmployees.add(employeeId);
+                    break;  // Move to the next employee
+                }
+            }
+        }
+
+        return highAccessEmployees;
+    }
+}
+
+3] Query Kth Smallest Trimmed Number
+   #code
+
+import java.util.PriorityQueue;
+
+class Solution {
+    public int[] smallestTrimmedNumbers(String[] numbers, int[][] queries) {
+
+        // Check if the input array is empty
+        if (numbers.length == 0)
+            return new int[0];
+
+        // Initialize the result array to store the output for each query
+        int[] result = new int[queries.length];
+
+        // Get the length of the strings in the input array (assuming all strings have the same length)
+        int stringLength = numbers[0].length();
+
+        // Array to hold the current index during comparison
+        int[] currentIndex = new int[1];
+
+        // Priority queue to store indices based on the lexicographical order of trimmed strings
+        PriorityQueue<Integer> queue = new PriorityQueue<>((index1, index2) -> {
+            for (int i = currentIndex[0]; i < stringLength; i++) {
+                // Compare characters at the current index of each string
+                if (numbers[index1].charAt(i) != numbers[index2].charAt(i))
+                    return numbers[index2].charAt(i) - numbers[index1].charAt(i);
+            }
+
+            // If the characters are equal, compare the indices themselves
+            return index2 - index1;
+        });
+
+        // Process each query
+        for (int i = 0; i < queries.length; i++) {
+            // Update the current index based on the trimming requirement
+            currentIndex[0] = stringLength - queries[i][1];
+            queue.clear();
+
+            // Populate the priority queue with indices based on the lexicographical order
+            for (int j = 0; j < numbers.length; j++) {
+                queue.add(j);
+                if (queue.size() > queries[i][0])
+                    queue.poll();
+            }
+
+            // Store the result for the current query
+            result[i] = queue.poll();
+        }
+
+        // Return the final result array
+        return result;
+    }
+}
+
+
+
+
