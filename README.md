@@ -12,8 +12,8 @@ Exciting News! Arsh Goyal and I are thrilled to announce our participation in th
 
 ## 📅 Schedule:
 
-- **Start Date:** [Your Start Date]
-- **End Date:** [Your End Date]
+- **Start Date:** [1-1-20024]
+- **End Date:** [31-1-2024]
 
 ## 🚀 About the Challenge:
 
