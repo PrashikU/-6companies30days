@@ -1,0 +1,149 @@
+1] Combination Sum III
+    #code
+
+class Solution {
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> result = new ArrayList<>();
+
+        if (k <= 0 || k > 9 || n <= 0 || n > 45 || (k == 1 && n > 9) || (k == 9 && n != 45) || (n < k * (k + 1) / 2)) {
+            return result;
+        }
+        if (k == 1) {
+            result.add(List.of(n));
+            return result;
+        }
+        if (k == 9) {
+            result.add(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9));
+            return result;
+        }
+
+        combinationSum3(1, k, n, new ArrayList<>(), result);
+        return result;
+    }
+
+    private void combinationSum3(int start, int k, int n, List<Integer> tempList, List<List<Integer>> result) {
+        if (k == 0) {
+            if (n == 0) {
+                result.add(new ArrayList<>(tempList));
+            }
+            return;
+        }
+
+        for (int i = start; i <= 9; i++) {
+            if (i > n) {
+                break;
+            }
+            tempList.add(i);
+            combinationSum3(i + 1, k - 1, n - i, tempList, result);
+            tempList.remove(tempList.size() - 1);
+        }
+    }
+}
+
+2]  Random Flip Matrix
+    #code
+
+class Solution {
+    // Current row index
+    int i = 0;
+    // Current column index
+    int j = 0;
+    // Total number of rows in the matrix
+    int m = 0;
+    // Total number of columns in the matrix
+    int n = 0;
+
+    /**
+     * Constructor to initialize the total number of rows and columns in the matrix.
+     *
+     * @param m    The total number of rows in the matrix.
+     * @param n    The total number of columns in the matrix.
+     */
+    public Solution(int m, int n) {
+        this.m = m;
+        this.n = n;
+    }
+    
+    /**
+     * Flip method to return the next flipped index in the 2D matrix.
+     *
+     * @return An array representing the flipped indices [row, col].
+     */
+    public int[] flip() {
+        // Increment the column index
+        j++;
+        
+        // Check if the column index exceeds the total number of columns
+        if (j == n) {
+            j = 0;   // Reset column index to 0
+            i++;    // Increment row index
+        }
+        
+        // Check if the row index exceeds the total number of rows
+        if (i == m) {
+            i = 0;   // Reset row index to 0
+            j = 0;   // Reset column index to 0
+        }
+
+        // Return the flipped indices
+        return new int[]{i, j};
+    }
+    
+    /**
+     * Reset method to reset the current indices to the starting position.
+     */
+    public void reset() {
+        // Reset both row and column indices to 0
+        i = 0;
+        j = 0;
+    }
+}
+
+3]  Letter Combinations of a Phone Number
+      #code
+
+class Solution {
+    private Map<Character, String> digitToLetters = new HashMap<>();
+    private List<String> resultList = new ArrayList<>();
+
+    public List<String> letterCombinations(String digits) {
+        if (digits == null || digits.length() == 0) {
+            return resultList;
+        }
+
+        digitToLetters.put('2', "abc");
+              digitToLetters.put('3', "def");
+                 digitToLetters.put('4', "ghi");
+                       digitToLetters.put('5', "jkl");
+                               digitToLetters.put('6', "mno");
+                                   digitToLetters.put('7', "pqrs");
+                                          digitToLetters.put('8', "tuv");
+                                         digitToLetters.put('9', "wxyz");
+
+        generateCombinations(digits, 0, new StringBuilder());
+
+        return resultList;
+
+
+    }
+
+
+    private void generateCombinations(String digits, int currentIndex, StringBuilder currentCombination) {
+        if (currentIndex == digits.length()) {
+            resultList.add(currentCombination.toString());
+            return;
+        }
+
+        char currentDigit = digits.charAt(currentIndex);
+        String letterOptions = digitToLetters.get(currentDigit);
+
+        if (letterOptions != null) {
+            for (int i = 0; i < letterOptions.length(); i++) {
+                char letter = letterOptions.charAt(i);
+                currentCombination.append(letter);
+                generateCombinations(digits, currentIndex + 1, currentCombination);
+                currentCombination.deleteCharAt(currentCombination.length() - 1);
+            }
+        }
+    }
+}
