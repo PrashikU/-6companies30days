@@ -1,0 +1,103 @@
+1] Find Missing and Repeating
+    #code
+
+class Solve {
+    int[] findTwoElement(int arr[], int n) {
+        int ans[] = new int[2];
+        
+       for(int i=0; i<n; i++) {
+           int x = Math.abs(arr[i])-1; 
+           
+           if(arr[x] < 0) {
+               ans[0] = x+1;
+               
+           } else {
+               arr[x] *= -1;
+           }
+           
+       }   
+       for(int i=0; i<n; i++) {
+           
+           if(arr[i] > 0) {
+               ans[1] = i+1;
+               break;
+           }
+       } 
+        
+        return ans;
+    }
+}
+
+2] Find Consecutive Integers from a Data Stream
+             #code
+class DataStream {
+
+    int val, main, count;
+    public DataStream(int value, int k) {
+        val = value;
+        main = k;
+        count = 0;
+    }
+
+    public boolean consec(int num) {
+        if (num == val) count++;
+        else count = 0;
+        return count >= main;
+    }
+}
+
+3] Following a Number Pattern
+
+    #code
+
+class Solution{
+    public String printMinNumberForPattern(String s){
+        // code here
+        boolean [] arr=new boolean[10];
+        
+        int n=s.length();
+        for(int i=1;i<10;i++){
+            Arrays.fill(arr,false);
+            arr[i]=true;
+            HashMap<Integer,Integer> map=new HashMap<>();
+            boolean flag=find(i,0,s,n,arr, map);
+           // System.out.println(" i = "+i);
+            if(flag){
+               String str=""+i;
+              for(int j=0;j<n;j++){
+                  str+=map.get(j);
+              }
+              return str;
+            }
+        }
+        return "-1";
+        
+     }
+     public boolean find(int s,int i, String str,int n ,boolean [] arr,HashMap<Integer,Integer> map){
+          if(i>=n) return true;
+          if(str.charAt(i)=='I'){
+              for(int j=s+1;j<10;j++){
+                  if(arr[j]==false){
+                      arr[j]=true;
+                      map.put(i,j);
+                      boolean flag=find(j,i+1,str,n,arr,map);
+                      if(flag) return true;
+                      arr[j]=false;
+                      
+                  }
+              }
+          }else{
+              for(int j=s-1;j>0;j--){
+                    if(arr[j]==false){
+                      arr[j]=true;
+                      map.put(i,j);
+                      boolean flag=find(j,i+1,str,n,arr,map);
+                      if(flag) return true;
+                      arr[j]=false;
+                      
+                  }
+              }
+          }
+          return false;
+     }
+}
