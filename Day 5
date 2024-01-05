@@ -1,0 +1,87 @@
+1] Number of People Aware of a Secret
+    #code
+class Solution {
+    public int peopleAwareOfSecret(int n, int delay, int forget) {
+        long mod = 1000000007L;
+        long[] shares = new long[n + 1];
+        long[] forgets = new long[n + 1];
+        
+        if (delay < n) {
+            shares[delay + 1] = 1;
+        }
+        if (forget < n) {
+            forgets[forget + 1] = 1;
+        }
+        
+        long shareToday = 0;
+        long peopleKnow = 1;
+        for (int i = delay; i <= n; i++) {
+            shareToday += shares[i] % mod;
+            shareToday -= forgets[i] % mod;
+			
+            peopleKnow -= forgets[i] % mod;
+            peopleKnow += shareToday % mod;
+            
+            if (i + delay < n + 1) {
+                shares[i + delay] += shareToday % mod;
+            }
+            if (i + forget < n + 1) {    
+                forgets[i + forget] += shareToday % mod;
+            }
+        }
+        
+        return (int) (peopleKnow % mod);
+    }
+}
+
+2] Run Length Encoding
+    #code
+class GfG
+ {
+	String encode(String str)
+	{
+        //Your code here
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<str.length(); i++) {
+            Integer c = 1;
+            while(i < str.length()-1 && str.charAt(i) == str.charAt(i+1)){
+                c++;
+                i++;
+            }
+            sb.append(str.charAt(i));
+            sb.append(c);
+            
+            
+        }
+        
+        return sb.toString();
+	}
+	
+ }
+
+3] Number of Ways to Reach a Position After Exactly k Steps
+
+    #code
+
+class Solution {
+    int mod = (int)1e9+7;
+    public int numberOfWays(int startPos, int endPos, int k) {
+        if((endPos-startPos)>k) return 0;
+        int[][] dp = new int[3000][k+1];
+        for(int[] a: dp)    Arrays.fill(a, -1);
+        
+        return helper(startPos, endPos, k,dp);
+    }
+    public int helper(int startPos, int endPos, int k,int[][] dp) {
+        if(k==0  ){
+            if(startPos == endPos  )
+                return 1; 
+            return 0;
+        }
+        if(dp[startPos+1000][k]!=-1) return dp[startPos+1000][k];
+        int ans = helper(startPos + 1, endPos, k - 1, dp) ;
+        if((k-1)>= (endPos - startPos +1))
+            ans += helper(startPos - 1, endPos, k - 1, dp) ;
+        return dp[startPos+1000][k]=ans%mod;
+    }
+}
