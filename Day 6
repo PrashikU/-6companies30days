@@ -1,0 +1,107 @@
+1] Circle and Rectangle Overlapping
+      #code
+
+class Solution {
+    public boolean checkOverlap(int radius, int xCenter, int yCenter, int x1, int y1, int x2, int y2) {
+        // Calculate the closest point on the rectangle to the center of the circle
+        int closestX = Math.max(x1, Math.min(xCenter, x2));
+        int closestY = Math.max(y1, Math.min(yCenter, y2));
+
+        // Calculate the distance between the closest point and the center of the circle
+        int distanceX = xCenter - closestX;
+        int distanceY = yCenter - closestY;
+
+        // Calculate the squared distance
+        int squaredDistance = distanceX * distanceX + distanceY * distanceY;
+
+        // Compare the squared distance with the squared radius
+        return squaredDistance <= radius * radius;
+    }
+}
+
+2] Find the Winner of the Circular Game
+      #code
+class Solution {
+    int lastAlive = 0;
+
+    public int findTheWinner(int n, int k) {
+        int currentIndex = 0;
+        k--;
+        List<Integer> people = new LinkedList<>();
+
+        for (int i = 1; i <= n; i++) {
+            people.add(i);
+        }
+
+        findLastAlive(people, k, currentIndex);
+        return lastAlive;
+    }
+
+    public void findLastAlive(List<Integer> people, int k, int currentIndex) {
+        if (people.size() == 1) {
+            lastAlive = people.get(0);
+            return;
+        }
+
+        currentIndex = (currentIndex + k) % people.size();
+        people.remove(currentIndex);
+        findLastAlive(people, k, currentIndex);
+    }
+}
+
+3] Russian Doll Envelopes
+          #code
+class Solution {
+    public int maxEnvelopes(int[][] envelopes) {
+        Arrays.sort(envelopes, (a, b) -> {
+            if (a[0] == b[0]) {
+                return b[1] - a[1];
+            } else {
+                return a[0] - b[0];
+            }
+        });
+
+        int heights[] = new int[envelopes.length];
+        int j = 0;
+        for (int i = 0; i < envelopes.length; i++) {
+            heights[j] = envelopes[i][1];
+            j++;
+        }
+
+        return lengthOfLIS(heights);
+    }
+
+    public int lengthOfLIS(int[] nums) {
+        ArrayList<Integer> lis = new ArrayList<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int index = binarySearch(lis, nums[i]);
+            if (index == lis.size()) {
+                lis.add(nums[i]);
+            } else {
+                lis.set(index, nums[i]);
+            }
+        }
+
+        return lis.size();
+    }
+
+    public int binarySearch(ArrayList<Integer> lis, int target) {
+        int start = 0;
+        int end = lis.size();
+        int result = lis.size();
+
+        while (start < end) {
+            int mid = (start + end) / 2;
+            if (lis.get(mid) < target) {
+                start = mid + 1;
+            } else {
+                end = mid;
+                result = mid;
+            }
+        }
+
+        return result;
+    }
+}
+
