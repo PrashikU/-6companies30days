@@ -1,0 +1,108 @@
+1] Image Smoother
+  #code
+class Solution {
+    public int[][] imageSmoother(int[][] inputImage) {
+        int rows = inputImage.length;
+        int cols = inputImage[0].length;
+        int[][] result = new int[rows][cols];
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                int totalSum = 0;
+                int count = 0;
+
+                for (int x = Math.max(0, i-1); x < Math.min(rows, i+2); ++x) {
+                    for (int y = Math.max(0, j-1); y < Math.min(cols, j+2); ++y) {
+                        totalSum += inputImage[x][y];
+                        count += 1;
+                    }
+                }
+
+                result[i][j] = totalSum / count;
+            }
+        }
+
+        return result;
+    }
+}
+
+2] Minimum Moves to Equal Array Elements II
+       #code
+import java.util.Random;
+
+class Solution {
+    public int minMoves2(int[] numbers) {
+        int operations = 0, mid = quickSelect(numbers, 0, numbers.length-1, numbers.length/2);
+        for (int num : numbers) operations += Math.abs(mid - num);
+        return operations;
+    }
+
+    private int quickSelect(int[] nums, int left, int right, int k) {
+        if (left == right) return nums[left];
+
+        int pivotIndex = new Random().nextInt(right - left + 1) + left;
+        pivotIndex = partition(nums, left, right, pivotIndex);
+
+        if (pivotIndex == k) return nums[k];
+        else if (pivotIndex < k) return quickSelect(nums, pivotIndex+1, right, k);
+        return quickSelect(nums, left, pivotIndex-1, k);
+    }
+
+    private int partition(int[] nums, int left, int right, int pivotIndex) {
+        int pivot = nums[pivotIndex];
+        swap(nums, pivotIndex, right);
+        pivotIndex = left;
+
+        for (int i = left; i <= right; i++) 
+            if (nums[i] <= pivot) swap(nums, i, pivotIndex++);
+
+        return pivotIndex - 1;
+    }
+
+    private void swap(int[] nums, int x, int y) {
+        int temp = nums[x];
+        nums[x] = nums[y];
+        nums[y] = temp;
+    }
+}
+
+3] Random Point in Non-overlapping Rectangles
+    #code
+import java.util.Random;
+import java.util.TreeMap;
+
+class Solution {
+    
+    private Random random;
+    private TreeMap<Integer, int[]> rectangleMap;
+    private int totalAreaSum = 0;
+    
+    public Solution(int[][] rects) {
+        this.random = new Random();
+        this.rectangleMap = new TreeMap<>();
+        
+        for(int i = 0; i < rects.length; i++){
+            int[] rectangleCoordinates = rects[i];
+            int length = rectangleCoordinates[2] - rectangleCoordinates[0] + 1; // +1 as we need to consider edges also.
+            int breadth = rectangleCoordinates[3] - rectangleCoordinates[1] + 1;
+            
+            totalAreaSum += length * breadth;
+            
+            rectangleMap.put(totalAreaSum, rectangleCoordinates);
+        }
+    }
+    
+    public int[] pick() {
+        int key = rectangleMap.ceilingKey(random.nextInt(totalAreaSum) + 1); // Don't forget to +1 here, because we need [1, area] while nextInt generates [0, area-1]
+        
+        int[] selectedRectangle = rectangleMap.get(key);
+        
+        int length = selectedRectangle[2] - selectedRectangle[0] + 1; // +1 as we need to consider edges also.
+        int breadth = selectedRectangle[3] - selectedRectangle[1] + 1;
+        
+        int x = selectedRectangle[0] + random.nextInt(length); // return random length from starting position of x
+        int y = selectedRectangle[1] + random.nextInt(breadth); // return random breadth from starting position of y
+        
+        return new int[]{x, y};
+    }
+}
