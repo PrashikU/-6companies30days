@@ -1,0 +1,99 @@
+1] Bulls and Cows
+    #code
+class Solution {
+    public String getHint(String secret, String guess) {
+        StringBuilder firstBuilder = new StringBuilder(secret);
+        StringBuilder secondBuilder = new StringBuilder(guess);
+        HashMap<Character, Integer> characterCount = new HashMap<>();
+        int numA = 0;
+        int numB = 0;
+
+        for (int i = secret.length() - 1; i > -1; i--) {
+            if (firstBuilder.charAt(i) == secondBuilder.charAt(i)) {
+                numA++;
+                firstBuilder.deleteCharAt(i);
+                secondBuilder.deleteCharAt(i);
+            } else {
+                if (!characterCount.containsKey(secret.charAt(i)))
+                    characterCount.put(secret.charAt(i), 0);
+                characterCount.put(secret.charAt(i), characterCount.get(secret.charAt(i)) + 1);
+            }
+        }
+
+        for (int i = 0; i < secondBuilder.length(); i++) {
+            if (characterCount.containsKey(secondBuilder.charAt(i)) && characterCount.get(secondBuilder.charAt(i)) > 0) {
+                numB++;
+                characterCount.put(secondBuilder.charAt(i), characterCount.get(secondBuilder.charAt(i)) - 1);
+            }
+        }
+
+        return numA + "A" + numB + "B";
+    }
+}
+
+
+2]  Count Number of Nice Subarrays
+
+        #code
+
+class Solution {
+    public int numberOfSubarrays(int[] nums, int k) {
+        return countOddSlidingWindow(nums, k) - countOddSlidingWindow(nums, k - 1);
+    }
+
+    static int countOddSlidingWindow(int[] array, int k) {
+        int n = array.length;
+        int startIdx = 0;
+        int oddSum = 0;
+        int totalCount = 0;
+
+        for (int currentIdx = 0; currentIdx < n; currentIdx++) {
+            if (array[currentIdx] % 2 != 0) {
+                oddSum++;
+            }
+
+            if (oddSum <= k) {
+                totalCount += currentIdx - startIdx + 1;
+            }
+
+            while (startIdx <= currentIdx && oddSum > k) {
+                if (array[startIdx] % 2 != 0) {
+                    oddSum--;
+                }
+                startIdx++;
+
+                if (oddSum <= k) {
+                    totalCount += currentIdx - startIdx + 1;
+                }
+            }
+        }
+
+        return totalCount;
+    }
+}
+
+3] Repeated DNA Sequences
+
+      #code
+
+class Solution {
+    public List<String> findRepeatedDnaSequences(String s) {
+        HashMap<String, Integer> sequenceMap = new HashMap<>();
+        
+        for(int i = 0; i <= s.length() - 10; i++) {
+            String currentSequence = s.substring(i, i + 10);
+            if(s.substring(i).contains(currentSequence)) {
+                sequenceMap.put(currentSequence, sequenceMap.getOrDefault(currentSequence, 0) + 1);
+                
+            }
+        }
+        
+        List<String> result = new ArrayList<>();
+        for(Map.Entry<String, Integer> entry : sequenceMap.entrySet()) {
+            if(entry.getValue() > 1) {
+                result.add(entry.getKey());
+            }
+        }
+        return result;
+    }
+}
