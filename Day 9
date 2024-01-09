@@ -1,0 +1,135 @@
+1] Maximum Product of the Length of Two Palindromic Subsequences
+
+        #code
+class Solution {
+    public int maxProduct(String s) {
+        char[] strArr = s.toCharArray();
+        int n = strArr.length;
+        Map<Integer, Integer> pali = new HashMap<>();
+        // save all elligible combination into hashmap
+        for (int mask = 0; mask < 1<<n; mask++){
+            String subseq = "";
+            for (int i = 0; i < 12; i++){
+                if ((mask & 1<<i) > 0)
+                    subseq += strArr[i];
+            }
+            if (isPalindromic(subseq))
+                pali.put(mask, subseq.length());
+        }
+        // use & opertion between any two combination
+        int res = 0;
+        for (int mask1 : pali.keySet()){
+            for (int mask2 : pali.keySet()){
+                if ((mask1 & mask2) == 0)
+                    res = Math.max(res, pali.get(mask1)*pali.get(mask2));
+            }
+        }
+
+        return res;
+    }
+
+    public boolean isPalindromic(String str){
+        int j = str.length() - 1;
+        char[] strArr = str.toCharArray();
+        for (int i = 0; i < j; i ++){
+            if (strArr[i] != strArr[j])
+                return false;
+            j--;
+        }
+        return true;
+    }
+}
+2]  Count the Number of Incremovable Subarrays I
+
+      #code
+class Solution {
+    public int incremovableSubarrayCount(int[] nums) {
+        int len=nums.length,maxi=0;
+        for(int i=0;i<len;i++)
+        {
+            for(int j=i;j<len;j++)
+            {
+                if(check(nums,i,j))
+                {
+                    maxi++;
+                }
+            }
+        }
+        return maxi;
+    }
+    private boolean check(int[] nums, int low, int high)
+    {
+        for(int i=0; i<low-1;i++)
+        {
+            if(nums[i] >= nums[i + 1])
+            {
+                return false;
+            }
+        }
+        if(low > 0 && high < nums.length-1 && nums[low-1]>=nums[high + 1])
+        {
+            return false;
+        }
+        for(int i = high+1;i<nums.length-1;i++)
+        {
+            if(nums[i] >= nums[i + 1])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+3] Find the City With the Smallest Number of Neighbors at a Threshold Distance
+
+          #code
+
+class Solution {
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        int dist[][]=new int[n][n];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                dist[i][j]=Integer.MAX_VALUE;
+            }
+        }
+
+        for(int i=0;i<edges.length;i++){
+                int u=edges[i][0];
+                int v=edges[i][1];
+                int wt=edges[i][2];
+                dist[u][v]=wt;
+                dist[v][u]=wt;
+        }
+        for(int i=0;i<n;i++){
+            dist[i][i]=0;
+        }
+
+        for(int via=0;via<n;via++){
+            for(int i=0;i<n;i++){
+                for(int j=0;j<n;j++){
+                    if(dist[i][via]==Integer.MAX_VALUE || dist[via][j]==Integer.MAX_VALUE)
+                        continue;      
+                    dist[i][j]=Math.min(dist[i][j],dist[i][via]+dist[via][j]);
+                }
+            }
+        }
+
+        int cntcity=n;
+        int cityNo=-1;
+        for(int i=0;i<n;i++){
+            int cnt=0;
+            for(int j=0;j<n;j++){
+                if(dist[i][j]<=distanceThreshold){
+                    cnt++;
+                }
+            }
+            if(cnt<=cntcity){
+                cntcity=cnt;
+                cityNo=i;
+            }
+        }
+        return cityNo;
+
+    }
+}
