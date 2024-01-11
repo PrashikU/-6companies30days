@@ -1,0 +1,116 @@
+1]  Largest Divisible Subset
+          #code
+
+public class Solution {
+    public List<Integer> largestDivisibleSubset(int[] nums) {
+        int n = nums.length;
+        int[] count = new int[n];
+        int[] pre = new int[n];
+        Arrays.sort(nums);
+        int max = 0, index = -1;
+        for (int i = 0; i < n; i++) {
+            count[i] = 1;
+            pre[i] = -1;
+            for (int j = i - 1; j >= 0; j--) {
+                if (nums[i] % nums[j] == 0) {
+                    if (1 + count[j] > count[i]) {
+                        count[i] = count[j] + 1;
+                        pre[i] = j;
+                    }
+                }
+            }
+            if (count[i] > max) {
+                max = count[i];
+                index = i;
+            }
+        }
+        List<Integer> res = new ArrayList<>();
+        while (index != -1) {
+            res.add(nums[index]);
+            index = pre[index];
+        }
+        return res;
+    }
+}
+
+2] Find Subsequence of Length K With the Largest Sum
+
+        #code
+
+class Solution {
+    public int[] maxSubsequence(int[] nums, int k) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> Integer.compare(nums[o1], nums[o2]));
+        for (int i = 0; i < nums.length; i++) {
+            if (pq.size() < k) {
+                pq.add(i); 
+            } else if (nums[pq.peek()] < nums[i]) {
+                pq.poll(); // remove an index of the smallest number
+                pq.add(i);
+            }
+        }        
+        int[] res = new int[k];
+        Set<Integer> indexes = new HashSet<>(pq);
+        for (int i = 0, j = 0; i < nums.length; i++) {
+            if (indexes.contains(i)) {
+                res[j++] = nums[i];
+            }
+        }
+        return res;
+    }
+}
+
+3]Amount of Time for Binary Tree to Be Infected
+    #code
+
+import java.util.*;
+
+class Solution {
+    public int amountOfTime(TreeNode root, int start) {
+        Map<Integer, Set<Integer>> map = new HashMap<>();
+        convert(root, 0, map);
+        Queue<Integer> q = new LinkedList<>();
+        q.add(start);
+        int minute = 0;
+        Set<Integer> visited = new HashSet<>();
+        visited.add(start);
+
+        while (!q.isEmpty()) {
+            int levelSize = q.size();
+            while (levelSize > 0) {
+                int current = q.poll();
+
+                for (int num : map.get(current)) {
+                    if (!visited.contains(num)) {
+                        visited.add(num);
+                        q.add(num);
+                    }
+                }
+                levelSize--;
+            }
+            minute++;
+        }
+        return minute - 1;
+    }
+
+    void convert(TreeNode current, int parent, Map<Integer, Set<Integer>> map) {
+        if (current == null) {
+            return;
+        } 
+        if (!map.containsKey(current.val)) {
+            map.put(current.val, new HashSet<>());
+        }
+        Set<Integer> adjacentList = map.get(current.val);
+        if (parent != 0) {
+            adjacentList.add(parent);
+        } 
+        if (current.left != null) {
+            adjacentList.add(current.left.val);
+        } 
+        if (current.right != null) {
+            adjacentList.add(current.right.val);
+        }
+        convert(current.left, current.val, map);
+        convert(current.right, current.val, map);
+    }
+}
+
