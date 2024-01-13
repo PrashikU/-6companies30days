@@ -1,0 +1,82 @@
+1] Get Equal Substrings Within Budget
+       #code
+
+class Solution {
+    public int equalSubstring(String s, String t, int maxCost) {
+        int i=0;
+        int j=0;
+        int ans=0;
+        int max=0;
+
+        while(j<s.length()){
+            ans+=Math.abs((int)s.charAt(j)-(int)t.charAt(j));
+
+            if(ans<=maxCost){
+                max=Math.max(max,j-i+1);
+            }
+             
+            else {
+                while(ans>maxCost){
+                    ans-=Math.abs((int)s.charAt(i)-(int)t.charAt(i));
+                    i++;
+                }
+            }
+            j++;
+
+        }
+        return max;
+    }
+}
+
+2]  Friends Of Appropriate Ages
+
+        #code
+class Solution {
+    public int numFriendRequests(int[] ages) {
+        int map[]=new int[121];
+        for(int j=0;j<ages.length;j++){
+            map[ages[j]]++;
+        }
+
+        for(int i=1;i<=120;i++){
+            map[i]+=map[i-1];
+        }
+        int totalFriend=0;
+        for(int i=0;i<ages.length;i++){
+            int cond=ages[i]/2+7;
+            if(cond>=ages[i]){
+                continue;
+            }
+            totalFriend+=map[ages[i]]-map[cond]-1;
+        }
+        return totalFriend;
+    }
+}
+
+3] Maximum Length of Repeated Subarray
+
+        #code
+class Solution {
+    
+    public int findLength(int[] nums1, int[] nums2) {
+        int m = nums1.length;
+        int n = nums2.length;
+
+        if (m == 0 || n == 0) {
+            return 0;
+        }
+
+       
+        int[][] dp = new int[m + 1][n + 1];
+        int max = 0;
+        for (int i = m - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                if (nums1[i] == nums2[j]) {
+                    dp[i][j] = dp[i+1][j+1] + 1;
+					max = Math.max(max, dp[i][j]);
+                }
+            }
+        }
+        return max;
+    }
+}
