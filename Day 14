@@ -1,0 +1,95 @@
+1] Verify Preorder Serialization of a Binary Tree
+              #code
+
+public class Solution {
+    public boolean isValidSerialization(String preorder) {
+        if (preorder == null) {
+            return false;
+        }
+        Stack<String> st = new Stack<>();
+        String[] strs = preorder.split(",");
+        for (int pos = 0; pos < strs.length; pos++) {
+            String curr = strs[pos];
+            while (curr.equals("#") && !st.isEmpty() && st.peek().equals(curr)) {
+                st.pop();
+                if (st.isEmpty()) {
+                    return false;
+                }
+                st.pop();
+            }
+            st.push(curr);
+        }
+        return st.size() == 1 && st.peek().equals("#");
+    }
+}   
+
+2] Top K Frequent Words
+        #code
+class Solution {
+  public List<String> topKFrequent(String[] words, int k) {
+        
+        
+        HashMap<String, Integer> map = new HashMap();
+        
+       
+        PriorityQueue<Map.Entry<String, Integer>> heap = new PriorityQueue<>(
+            (a,b)->{
+                if(a.getValue() != b.getValue())
+                    return a.getValue().compareTo(b.getValue());
+                return -a.getKey().compareTo(b.getKey());
+            }
+        );
+        
+        
+        for(String word: words){
+            map.merge(word, 1, Integer::sum);
+        }
+        
+        // put into heap
+        for(Map.Entry<String, Integer> entry: map.entrySet()){
+            heap.offer(entry);
+            if(heap.size() > k)
+                heap.poll();
+        }
+        
+     
+        List<String> ans = new ArrayList();
+        while(heap.size() > 0)
+            ans.add(heap.poll().getKey());
+        
+     
+        Collections.reverse(ans);
+        return ans;
+    }
+}
+
+3] Battleships in a Board
+      #code
+
+
+class Solution {
+    public int countBattleships(char[][] board) {
+        if (board == null) {
+            throw new IllegalArgumentException("Input is null");
+        }
+        if (board.length == 0 || board[0].length == 0) {
+            return 0;
+        }
+
+        int rows = board.length;
+        int cols = board[0].length;
+        int count = 0;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (board[i][j] == 'X'
+						&& (j == cols - 1 || board[i][j + 1] == '.')
+                        && (i == rows - 1 || board[i + 1][j] == '.')) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+}
