@@ -1,0 +1,117 @@
+1] Sort Characters By Frequency
+        #code
+class Solution {
+    static class Pair{
+        char ch;
+        int freq;
+        public Pair(char ch, int freq){
+            this.ch=ch;
+            this.freq=freq;
+        }
+    }
+    public String frequencySort(String s) {
+        HashMap<Character, Integer> map= new HashMap<>();
+        
+        for(int i=0;i<s.length();i++){
+            char curr= s.charAt(i);
+            map.put(curr, map.getOrDefault(curr,0)+1);
+        }
+
+        PriorityQueue<Pair> pq= new PriorityQueue<>((a,b)-> a.freq==b.freq ? a.ch - b.ch : b.freq- a.freq);
+        for(Character i: map.keySet()){
+            pq.add(new Pair(i, map.get(i)));
+        }
+
+        String ans="";
+
+        while(!pq.isEmpty()){
+            char ch= pq.peek().ch;
+            int fr= pq.peek().freq;
+            pq.poll();
+
+            while(fr!=0){
+                ans+=ch;
+                fr--;
+            }
+
+        }
+
+        return ans;
+    }
+}
+
+2] Word Break
+    #code
+class Solution {
+    public boolean wordBreak(String s, List<String> wordDict) {
+        return recWay1(s, wordDict);
+    }
+
+    boolean recWay2(String s, List<String> wordDict) {
+        Boolean[] memo = new Boolean[s.length() + 1];
+        return wordBreak2(s, new HashSet<>(wordDict), 0, memo);
+    }
+
+    boolean wordBreak2(String s, Set<String> wordDict, int k, Boolean[] memo) {
+        int n = s.length();
+        if (k == n) return true;
+
+        if (memo[k] != null) return memo[k];
+
+        for (int i=k + 1; i<=n; i++) {
+            String word = s.substring(k, i);
+            if (wordDict.contains(word) && wordBreak2(s, wordDict, i, memo)) {
+                return memo[k] = true;
+            }
+        }
+
+        return memo[k] = false;
+    }
+
+    boolean recWay1(String s, List<String> wordDict) {
+        Boolean[] memo = new Boolean[s.length() + 1];
+        return wordBreak(s, wordDict, 0, memo);
+    }
+    
+    boolean wordBreak(String s, List<String> wordDict, int k, Boolean[] memo) {
+        if (k == s.length()) {
+            return true;
+        }
+        
+        if (memo[k] != null) {
+            return memo[k];
+        }
+        
+        for (int i=0; i<wordDict.size(); i++) {
+            String word = wordDict.get(i);
+            if (s.startsWith(word, k)) {
+                if(wordBreak(s, wordDict, k + word.length(), memo)) return memo[k] = true;
+            }
+        }
+                   
+        return memo[k] = false;
+    }
+}
+
+3] Extra Characters in a String
+      #code
+class Solution {
+    public int minExtraChar(String s, String[] dictionary) {
+        int maxVal = s.length() + 1;
+        int[] dp = new int[s.length() + 1];
+        Arrays.fill(dp, maxVal);
+        dp[0] = 0;
+
+        Set<String> dictionarySet = new HashSet<>(Arrays.asList(dictionary));
+
+        for (int i = 1; i <= s.length(); ++i) {
+            dp[i] = dp[i - 1] + 1;
+            for (int l = 1; l <= i; ++l) {
+                if (dictionarySet.contains(s.substring(i - l, i))) {
+                    dp[i] = Math.min(dp[i], dp[i - l]);
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+}
