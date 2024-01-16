@@ -1,0 +1,73 @@
+1] Trim a Binary Search Tree
+        #code
+
+class Solution {
+    public TreeNode trimBST(TreeNode root, int low, int high) {
+        if(root==null){
+            return null;
+        }
+        root.left=trimBST(root.left,low,high);
+        root.right=trimBST(root.right,low,high);
+        if(root.val<low || root.val>high){
+            if(root.left!=null){
+                root=root.left;
+            }else if(root.right!=null){
+                root=root.right;
+            }else{
+                root=null;
+            }
+        }
+        return root;
+    }
+}
+
+2] Construct the Longest New String
+      #code
+
+class Solution {
+    public int longestString(int x, int y, int z) {
+     if(x == y) return (x + y + z) * 2;
+     else return (Math.min(x, y) + Math.min(x, y) + 1 + z) * 2;
+    }
+}
+
+3] Short Encoding of Words
+      #code
+
+class Solution {
+    TrieNode root;
+    class TrieNode {
+        TrieNode[] next = null;
+    }
+    public int minimumLengthEncoding(String[] words) {
+        root = new TrieNode();
+        root.next = new TrieNode[26];
+        int res = 0;
+        for (String w : words) {
+            res += helper(w);
+        }
+        return res;
+    }
+    public int helper(String w) {
+        int length = w.length();
+        boolean newBranch = false;
+        int create = 0;
+        TrieNode current = root;
+        for (int i = length - 1; i >= 0; --i) {
+            boolean newLevel = false;
+            int id = w.charAt(i) - 'a';
+            if (current.next == null) {
+                newLevel = true;
+                current.next = new TrieNode[26];
+            }
+            if (current.next[id] == null) {
+                if (!newLevel) newBranch = true;
+                current.next[id] = new TrieNode();
+                create++;
+            }
+            current = current.next[id];
+        }
+        return newBranch ? length + 1 : create;
+    }
+}
+
