@@ -1,0 +1,112 @@
+1] Maximize Area of Square Hole in Grid
+          #code
+
+class Solution {
+    public int maximizeSquareHoleArea(int n, int m, int[] hBars, int[] vBars) {
+        
+        int hGap = calculateMaxGap( hBars );
+        int vGap = calculateMaxGap( vBars );
+        int area = Math.min( hGap, vGap );
+        return area * area;
+        
+    }
+    private int calculateMaxGap( int [] bar ){
+        Arrays.sort( bar);
+
+        int currGap = 2, maxGap = 2;
+    
+
+        for( int i = 1; i < bar.length; i ++ ){
+           currGap = ( bar[ i -1]+1 == bar[i] ) ? ++currGap  : 2;
+           maxGap = Math.max( maxGap, currGap );
+        }
+        return maxGap;
+        
+    }
+}
+
+2] LRU Cache
+    #code
+
+class LRUCache {
+    
+    int capacity;
+    Map<Integer,Integer> map=new LinkedHashMap<>();
+
+    public LRUCache(int capacity) {
+        this.capacity=capacity;
+    }
+    
+    public int get(int key) {
+        if(map.containsKey(key)){
+            Integer val = map.get(key);
+            map.remove(key);
+
+            map.put(key,val);
+            return map.get(key);
+        }
+        else return -1;
+    }
+    
+    public void put(int key, int value) {
+        if(map.containsKey(key)){
+            map.remove(key);
+            map.put(key,value);
+        }
+        else{
+            if(map.size()<capacity){
+                map.put(key,value);
+            }else{
+                // removing first element in the map.
+                Iterator<Integer> iterator = map.keySet().iterator();
+                map.remove(iterator.next());
+                map.put(key,value);
+            }
+        }
+    }
+}
+
+3] Find Beautiful Indices in the Given Array I
+
+        #code
+
+class Solution {
+    public List<Integer> beautifulIndices(String s, String a, String b, int k) {
+        List<Integer> result = new ArrayList<>();
+
+        List<Integer> indicesA = new ArrayList<>();
+        List<Integer> indicesB = new ArrayList<>();
+
+        for (int i = 0; i <= s.length() - a.length(); i++) {
+            if (s.substring(i, i + a.length()).equals(a)) {
+                indicesA.add(i);
+            }
+        }
+            
+        for (int i = 0; i <= s.length() - b.length(); i++) {
+            if (s.substring(i, i + b.length()).equals(b)) {
+                indicesB.add(i);
+            }
+        }
+
+        for (int i : indicesA) {
+            int low = 0, high = indicesB.size() - 1;
+            while (low <= high) {
+                int mid = low + (high - low) / 2;
+                int j = indicesB.get(mid);
+
+                if (Math.abs(i - j) <= k) {
+                    result.add(i);
+                    break;
+                } else if (j < i) {
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
+            }
+        }
+
+        return result;
+    }
+}
+
