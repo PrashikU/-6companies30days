@@ -1,0 +1,218 @@
+1] Query Kth Smallest Trimmed Number
+        #code
+class Solution {
+        public int[] smallestTrimmedNumbers(String[] nums, int[][] queries) {
+        int[] solution = new int[queries.length];
+
+        //1. Map the elements into an object so we can easily track which index a particular number belongs to
+        Node[] unsorted = new Node[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            unsorted[i] = new Node(nums[i], i);
+        }
+
+        int digit = nums[0].length() - 1;
+        int len = nums[0].length();
+
+        int finished = 0;
+        //2. Loop through all of the digits from the end to the start.
+        while (digit >= 0 && finished < queries.length) {
+            //3. perform counting sort on the current digit, this will sort the array up to the trimmed value
+            unsorted = countingSort(unsorted, digit);
+            int qIndex = 0;
+
+            //4. find any queries whose trim value matches the digit we have currently sorted to
+            for (int[] query : queries) {
+                int trimi = query[1];
+                int ki = query[0];
+                //5. find the kith smallest value for the query and add it to the solution
+                if (len - trimi == digit) {
+                    solution[qIndex] = unsorted[ki - 1].index;
+                    finished++;
+                }
+                qIndex++;
+            }
+            digit--;
+        }
+
+        return solution;
+    }
+
+    public Node[] countingSort(Node[] unsorted, int digit) {
+        
+        int[] buckets = new int[10];
+        for (Node num : unsorted) {
+            buckets[num.value.charAt(digit) - '0']++;
+        }
+
+        for (int i = 1; i < buckets.length; i++) {
+            buckets[i] = buckets[i] + buckets[i - 1];
+        }
+
+        Node[] sorted = new Node[unsorted.length];
+        for (int i = unsorted.length - 1; i >= 0; i--) {
+            sorted[--buckets[unsorted[i].value.charAt(digit) - '0']] = unsorted[i];
+        }
+
+        return sorted;
+    }
+
+        private class Node {
+        String value;
+        int index;
+
+        public Node(String value, int index) {
+            this.index = index;
+            this.value = value;
+        }
+    }
+}
+
+2] The Number of Good Subsets
+   #code
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.function.LongBinaryOperator;
+
+import static java.lang.Math.max;
+import static java.lang.Math.pow;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
+class Solution {
+    private static final int[] PRIMES = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; // primes up to 30
+    private static final long MAX = (long) pow(10, 9) + 7;
+    private static final LongBinaryOperator ADD = (x, y) -> (x + y) % MAX;
+
+    private final Map<Integer, OptionalInt> isGood = new HashMap<>();
+    
+    public int numberOfGoodSubsets(int[] A) {
+        var freq = Arrays.stream(A)
+                         .filter(a -> a > 1)
+                         .mapToObj(this::test)
+                         .filter(OptionalInt::isPresent)
+                         .collect(groupingBy(OptionalInt::getAsInt, counting()));
+
+        Map<Integer, Long> cache = new HashMap<>();
+        cache.put(0, 0L); // or we can set its value to 1 and in the end use: subSetWithoutOne - 1
+
+        for (var numFreq : freq.entrySet()) {
+            int a = numFreq.getKey();
+            long aCount = numFreq.getValue();
+
+            for (int b : cache.keySet().toArray(Integer[]::new)) {
+                if ((a & b) > 0)
+                    continue;
+
+                long bCount = cache.get(b); // Note: cache.get(b) is zero when b is 0
+
+                cache.merge(a | b, (aCount * max(1, bCount)) % MAX, ADD::applyAsLong);
+            }
+        }
+
+        int ones = (int) Arrays.stream(A)
+                               .filter(a -> a == 1)
+                               .count();
+        long effectOfOne = powAndRemainder(2, ones, MAX);
+        long subSetWithoutOne = cache.values()
+                                     .stream()
+                                     .mapToLong(x -> x)
+                                     .reduce(0L, ADD);
+
+        return (int) ((effectOfOne * subSetWithoutOne) % MAX);
+    }
+
+    /**
+     * @param x
+     * @param n
+     * @param r
+     * @return (x ^ n) % r
+     */
+    private static long powAndRemainder(int x, int n, long r) {
+        if (n == 0)
+            return 1;
+
+        long out = powAndRemainder(x, n / 2, r);
+        out = (out * out) % r;
+
+        if (n % 2 == 1)
+            out = (out * x) % r;
+
+        return out;
+    }
+
+    /**
+     * tests if given number a is good number or not.
+     *
+     * @param a
+     * @return OptionalInt.empty() if a is not a good number else OptionalInt object containing masked representation of
+     * the number "a" where ith bit of the mask is 1 if prime i divides the number a
+     */
+    private OptionalInt test(int a) {
+        OptionalInt output = isGood.get(a);
+
+        if (nonNull(output))
+            return output;
+
+        int repr = 0;
+
+        for (int i = 0, num = a, p, mask; i < PRIMES.length && num > 1; ) {
+            if (num % (p = PRIMES[i]) != 0) {
+                i++;
+                continue;
+            }
+
+            mask = 1 << p;
+
+            if ((mask & repr) > 0) {
+                repr = 0;
+                break;
+            }
+
+            repr |= mask;
+            num /= p;
+        }
+
+        output = repr == 0 ? OptionalInt.empty() : OptionalInt.of(repr);
+
+        isGood.put(a, output);
+
+        return output;
+    }
+}
+
+3] Count Collisions on a Road
+        #code
+class Solution {
+    public int countCollisions(String directions) {
+        Stack<Character> stack = new Stack<>();
+        int collisions = 0;
+        
+        for(char direction : directions.toCharArray()){
+            if(!stack.isEmpty() && direction == 'L' && stack.peek() != 'L'){ 
+                int prev = stack.pop();
+                collisions++;
+                if(prev == 'R')
+                    collisions++;
+                while(!stack.isEmpty() && stack.peek() == 'R'){
+                    collisions++;
+                    stack.pop();
+                }
+                stack.push('S');
+            }
+            else if(!stack.isEmpty() && direction == 'S' && stack.peek() == 'R'){
+                while(!stack.isEmpty() && stack.peek() == 'R'){
+                    collisions++;
+                    stack.pop();
+                }
+                stack.push('S');
+            }
+            else{
+                stack.push(direction);
+            }
+        }
+        return collisions;
+    }
+}
