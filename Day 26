@@ -1,0 +1,124 @@
+1] Destroying Asteroids
+      #code
+class Solution {
+    public boolean asteroidsDestroyed(int mass, int[] asteroids) {
+
+        Arrays.sort(asteroids);
+        long planet = mass;
+        for(int i=0;i<asteroids.length;i++){
+            if(planet<asteroids[i])
+                return false;
+            else
+                planet = planet + asteroids[i];
+
+        }
+        
+        return true;
+    }
+}
+
+2] Find the City With the Smallest Number of Neighbors at a Threshold Distance
+            #code
+class Solution {
+
+     class Pair{
+        int node;
+        int dis;
+        Pair(int node, int dis){
+            this.node = node;
+            this.dis = dis;
+        }
+    }
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+           List<List<Pair>> adjList = new ArrayList<>(); 
+        for(int i = 0; i<n; i++)
+        adjList.add(new ArrayList<>());
+        
+        for(int[] edge: edges){
+            
+            adjList.get(edge[0]).add(new Pair(edge[1], edge[2]));
+            adjList.get(edge[1]).add(new Pair(edge[0], edge[2]));
+        }
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((x,y) -> x.dis - y.dis); 
+        int city = 0;
+        int cntmax = n;
+       
+        for(int i = 0; i<n; i++)
+        {
+            
+            int[] dist = new int[n];
+            Arrays.fill(dist, Integer.MAX_VALUE);
+            pq.add(new Pair(i, 0));
+            dist[i] = 0;
+            
+            
+            while(!pq.isEmpty())
+            {
+                Pair curnode = pq.poll();
+                int getval = curnode.node;
+                int getdis = curnode.dis;
+                for(Pair neighbour: adjList.get(getval))
+                {
+                    int newdis = getdis + neighbour.dis;
+                    if(newdis <= distanceThreshold && newdis < dist[neighbour.node])
+                    {
+                        pq.add(new Pair(neighbour.node, newdis));
+                        dist[neighbour.node] = newdis;
+                    }
+                }
+            }
+            
+        
+            
+            int cnt = 0;
+            for(int j = 0; j<n; j++)
+            {
+                if(dist[j] != Integer.MAX_VALUE)
+                {
+                    cnt++;
+                }
+            }
+            if(cnt <= cntmax)
+            {
+                city = Math.max(city,i);
+                cntmax = cnt;
+            }
+        }  
+
+        return city;
+    }
+}
+3] Integer to English Words
+        #CODE
+class Solution {
+
+    private final String[] belowTwenty = {"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+            "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+    private final String[] tens = {"", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+
+    public String numberToWords(int num) {
+        if (num == 0) {
+            return "Zero";
+        }
+        return helper(num);
+    }
+
+    private String helper(int num) {
+        StringBuilder result = new StringBuilder();
+        if (num < 20) {
+            result.append(belowTwenty[num]);
+        } else if (num < 100) {
+            result.append(tens[num / 10]).append(" ").append(belowTwenty[num % 10]);
+        } else if (num < 1000) {
+            result.append(helper(num / 100)).append(" Hundred ").append(helper(num % 100));
+        } else if (num < 1000000) {
+            result.append(helper(num / 1000)).append(" Thousand ").append(helper(num % 1000));
+        } else if (num < 1000000000) {
+            result.append(helper(num / 1000000)).append(" Million ").append(helper(num % 1000000));
+        } else {
+            result.append(helper(num / 1000000000)).append(" Billion ").append(helper(num % 1000000000));
+        }
+        return result.toString().trim();
+    }
+}
