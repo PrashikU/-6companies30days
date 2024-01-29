@@ -1,0 +1,188 @@
+1] Count Subtrees With Max Distance Between Cities
+
+          #code
+class Solution {
+
+    List<Integer>[] tree, subTree;
+    int subTreeRoot, maxPath;
+    boolean[] inStack; // do not allow to travel upwards in the rooted tree
+    int[] ans;
+
+    public int[] countSubgraphsForEachDiameter(int n, int[][] edges) {
+        buildTree(n, edges);
+        ans = new int[n - 1];
+        solve(0);
+        return ans;
+    }
+
+    private void buildTree(int n, int[][] edges) {
+        tree = new List[n];
+        subTree = new List[n];
+        inStack = new boolean[n];
+        for (int i = 0; i < n; ++i) {
+            tree[i] = new ArrayList<>();
+            subTree[i] = new ArrayList<>();
+        }
+        for (int[] e : edges) {
+            tree[e[0] - 1].add(e[1] - 1);
+            tree[e[1] - 1].add(e[0] - 1);
+        }
+    }
+
+    private void solve(int i) {
+        subTreeRoot = i;
+        inStack[i] = true;
+        buildSubTree(0, 0, Collections.singletonList(i), new ArrayList<>());
+        for (int e : tree[i]) {
+            if (inStack[e]) {
+                continue;
+            } 
+            solve(e);
+        }
+    }
+
+    private void buildSubTree(int i, int j, List<Integer> fronteer, List<Integer> next) {
+        if (i >= fronteer.size()) {
+            buildNextLevel(next);
+            return;
+        }
+        int curr = fronteer.get(i);
+        if (j >= tree[curr].size()) {
+            buildSubTree(i + 1, 0, fronteer, next);
+        } else {
+            int succ = tree[curr].get(j);
+            if (inStack[succ]) {
+                buildSubTree(i, j + 1, fronteer, next);
+                return;
+            }
+            inStack[succ] = true;
+            next.add(succ);
+            subTree[curr].add(succ);
+            buildSubTree(i, j + 1, fronteer, next);
+            next.remove(next.size() - 1);
+            subTree[curr].remove(subTree[curr].size() - 1);
+            buildSubTree(i, j + 1, fronteer, next);
+            inStack[succ] = false;
+        }
+    }
+
+    private void buildNextLevel(List<Integer> next) {
+        if (next.isEmpty()) { // subTree is done, add it to the answer
+            maxPath = 0;
+            computeMaxPath(subTreeRoot);
+            if (maxPath > 1) {
+                ++ans[maxPath - 2];
+            }
+        } else {
+            buildSubTree(0, 0, next, new ArrayList<>());
+        }
+    }
+
+    private int computeMaxPath(int i) {
+        int max = 0, prevMax = 0;
+        for (int child : subTree[i]) {
+            int h = computeMaxPath(child);
+            if (h >= max) {
+                prevMax = max;
+                max = h;
+            } else {
+                prevMax = Integer.max(prevMax, h);
+            }
+        }
+        maxPath = Integer.max(maxPath, prevMax + max + 1);
+        return max + 1;
+    }
+}
+
+2] Minimum Number of Days to Disconnect Island
+            #code
+class Solution {
+    public int minDays(int[][] grid) {
+        
+        int m=grid.length,n=grid[0].length;
+        boolean visited[][]=new boolean[m][n];
+        int islandCount=0;
+
+        for(int i=0;i<m;i++)
+            for(int j=0;j<n;j++)
+                if(grid[i][j]==1 && !visited[i][j]){
+                    islandCount++;
+                    countIsland(i,j,grid,visited,m,n);
+                }
+
+        if(islandCount > 1)
+            return 0;
+
+        int onesCount=0;
+
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(grid[i][j] == 1){
+                    onesCount++;
+                    grid[i][j] = 0;
+                    if(checkIsland(grid) > 1)
+                        return 1;
+                    grid[i][j] = 1;
+                }
+            }
+        }
+
+        return (onesCount == 0) ? 0 :(onesCount == 1) ? 1 : 2;
+
+    }
+    public int checkIsland(int[][] grid){
+        int islandCount=0;
+        int m=grid.length,n=grid[0].length;
+        boolean visited[][]=new boolean[m][n];
+
+        for(int i=0;i<m;i++)
+            for(int j=0;j<n;j++)
+                if(grid[i][j]==1 && !visited[i][j]){
+                    islandCount++;
+                    countIsland(i,j,grid,visited,m,n);
+                }
+
+        return islandCount;
+
+    }
+
+    public void countIsland(int r,int c,int[][] grid,boolean[][] visited,int m,int n){
+
+        visited[r][c]=true;
+        int arr1[]={ 0, 0, -1, 1 };
+        int arr2[]={ 1, -1, 0, 0 };
+
+        for(int i=0;i<4;i++){
+            int nr = r + arr1[i];
+            int nc = c + arr2[i];
+            if(nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] == 1 && !visited[nr][nc])
+                countIsland(nr,nc,grid,visited,m,n);
+        }
+    }
+}
+
+3] Sum of Scores of Built Strings
+        #code
+class Solution {
+    public long sumScores(String s) {
+        int n = s.length();
+        char[] ss = s.toCharArray();
+        int[] z = new int[n];
+        int l = 0, r=0;
+        
+        for(int i=1;i<n;i++){
+            if(i<=r) 
+                z[i] = Math.min(z[i-l],r-i+1);//the current position is inside the current segment match .Then we can use the already calculated Z-values to initialize the value of z[i]. 
+            while(i+z[i]<n && ss[z[i]] == ss[i+z[i]])
+                z[i]++;
+            if(i+z[i]-1>r){
+               l = i ;r= i+z[i]-1; //the current position is outside of what we have already processed.We will then compute  with the trivial algorithm.
+            }
+        }
+        long sum = n;
+        for(int i=0;i<n;i++){
+          sum+=z[i];            
+        }
+        return sum;
+    }
+}
